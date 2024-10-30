@@ -1,14 +1,17 @@
-from config import USNW_ROOT, IOT_TON_ROOT, NSL_KDD_ROOT, CICIDS_ROOT
+from process import get_cicids_train_test, get_ton_iot_train_test, get_usnw_train_test, get_nsl_kdd_train_test
 
 
 def get_train_test(dataset_name):
-    dataset_dict = {
-        'USNW': USNW_ROOT,
-        'IOT_TON': IOT_TON_ROOT,
-        'NSL_KDD': NSL_KDD_ROOT,
-        'CICIDS': CICIDS_ROOT
-    }
-    if dataset_name not in dataset_dict or not dataset_dict[dataset_name]:
-        raise ValueError(f"Path for dataset {dataset_name} is not defined in the .env file")
+    if dataset_name == "CICIDS":
+        return get_cicids_train_test()
 
+    if dataset_name == "TON_IOT":
+        return get_ton_iot_train_test()
 
+    if dataset_name == "USNW":
+        return get_usnw_train_test()
+
+    if dataset_name == "NSL_KDD":
+        return get_nsl_kdd_train_test()
+    else:
+        raise ValueError(f"Dataset {dataset_name} is not supported.")
