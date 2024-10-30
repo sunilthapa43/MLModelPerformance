@@ -1,9 +1,9 @@
-from tensorflow.keras.utils import to_categorical
 import tensorflow as tf
 import numpy as np
-from sklearn.metrics import confusion_matrix, recall_score, f1_score, precision_score
+from sklearn.metrics import confusion_matrix, recall_score, f1_score, precision_score, accuracy_score
 
 from tensorflow.keras.utils import to_categorical
+
 
 
 def evaluate_model(model, X_train, X_test, y_train, y_test):
@@ -14,12 +14,12 @@ def evaluate_model(model, X_train, X_test, y_train, y_test):
         # Prepare labels
         if num_classes > 2:
             y_train_cat = to_categorical(y_train)  # For multiclass classification
-            model.fit(X_train, y_train_cat, epochs=5, batch_size=32, verbose=0)
+            model.fit(X_train, y_train_cat, epochs=10, batch_size=32, verbose=1)
             y_pred_probs = model.predict(X_test)
-            y_pred = np.argmax(y_pred_probs, axis=1)
+            y_pred = (y_pred_probs > 0.5).astype(int)
         else:
             # For binary classification
-            model.fit(X_train, y_train, epochs=5, batch_size=32, verbose=0)
+            model.fit(X_train, y_train, epochs=10, batch_size=32, verbose=0)
             y_pred_probs = model.predict(X_test)
             y_pred = (y_pred_probs > 0.5).astype("int32").flatten()
 
@@ -29,8 +29,8 @@ def evaluate_model(model, X_train, X_test, y_train, y_test):
         y_pred = model.predict(X_test)
 
     # Compute metrics
-    fpr, recall, f1, precision = compute_metrics(y_test, y_pred)
-    return fpr, recall, f1, precision
+    fpr, recall, f1, precision, accuracy = compute_metrics(y_test, y_pred)
+    return fpr, recall, f1, precision, accuracy
 
 
 # Compute metrics
@@ -46,7 +46,8 @@ def compute_metrics(y_true, y_pred):
         tn = conf_matrix.sum() - (fp + conf_matrix.sum(axis=1) - np.diag(conf_matrix))
         fpr = np.mean(fp / (fp + tn))  # Mean FPR for all classes
 
+    accuracy = accuracy_score(y_true, y_pred)
     recall = recall_score(y_true, y_pred, average='macro')
     f1 = f1_score(y_true, y_pred, average='macro')
     precision = precision_score(y_true, y_pred, average='macro')
-    return fpr, recall, f1, precision
+    return fpr, recall, f1, precision, accuracy

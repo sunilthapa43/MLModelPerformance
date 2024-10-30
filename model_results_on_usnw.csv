@@ -1,0 +1,7 @@
+Model,F1 Score,Accuracy,Precision,Recall,FPR
+AdaBoost,0.9,0.9,0.91,0.89,0.18
+DecisionTree,0.92,0.92,0.92,0.92,0.12
+GradientBoosting,0.86,0.87,0.89,0.86,0.26
+MLP,0.83,0.84,0.88,0.82,0.34
+LSTM,0.84,0.85,0.88,0.83,0.32
+GRU,0.84,0.85,0.88,0.84,0.3

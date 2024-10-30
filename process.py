@@ -100,9 +100,7 @@ def get_cicids_train_test():
 def get_ton_iot_train_test():
     df = pd.read_csv(TON_IOT_ROOT + "train_test_network.csv", encoding="utf-8-sig", low_memory=False)
     numerical_features = df.select_dtypes(include=[np.number]).columns.tolist()
-    df = df.replace("-", 0)
-    df = df.apply(pd.to_numeric, errors='coerce')
-    print(df.head())
+    df.replace("-", np.nan, inplace=True)
     # Clean the data
     df = clean_data(df, encode_features=iot_ton_encode_features)
     X_train, X_test, y_train, y_test = split_into_train_test(df, column_name="label")
