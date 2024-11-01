@@ -99,16 +99,16 @@ def get_cicids_train_test():
 
 def get_ton_iot_train_test():
     df = pd.read_csv(TON_IOT_ROOT + "train_test_network.csv")
-    df.replace("-", np.nan, inplace=True)
+    # df.replace("-", np.nan, inplace=True)
     df, y = df.drop("label", axis=1), df["label"]
-    categorical_columns = get_cat_columns(df)
+    categorical_columns = df.select_dtypes(include=['object', 'category']).columns
     non_categorical_columns = [col for col in df.columns if col not in categorical_columns]
     # Clean the data
     df = clean_data(df, encode_features=categorical_columns)
-    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=42, shuffle=True)
-    scalar = StandardScaler()
-    X_train[non_categorical_columns] = scalar.fit_transform(X_train[non_categorical_columns])
-    X_test[non_categorical_columns] = scalar.transform(X_test[non_categorical_columns])
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=0.3, random_state=42, shuffle=True)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
 def get_usnw_train_test():
