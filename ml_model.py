@@ -9,24 +9,24 @@ from tensorflow.keras.layers import LSTM, GRU, Dense, Input
 # Define models
 def initialize_models(X_train, X_test):
     models = {
-        'AdaBoost': AdaBoostClassifier(
-            estimator=DecisionTreeClassifier(max_depth=3, class_weight='balanced'),
-            n_estimators=300,
-            random_state=42,
-            learning_rate=0.5
-        ),
-        'DecisionTree': DecisionTreeClassifier(
-            max_depth=10,  # Adjust this based on your dataset and experimentation
-            class_weight='balanced',  # Handles imbalanced classes
-            criterion='gini',  # Use "gini" or "entropy" based on experiments
-            random_state=42  # Ensures reproducibility
-        ),
-        'GradientBoosting': GradientBoostingClassifier(
-            n_estimators=100,
-            max_depth=10,
-            learning_rate=0.4,  # Handles class imbalance
-            random_state=42
-        ),
+        # 'AdaBoost': AdaBoostClassifier(
+        #     estimator=DecisionTreeClassifier(max_depth=3, class_weight='balanced'),
+        #     n_estimators=300,
+        #     random_state=42,
+        #     learning_rate=0.5
+        # ),
+        # 'DecisionTree': DecisionTreeClassifier(
+        #     max_depth=10,  # Adjust this based on your dataset and experimentation
+        #     class_weight='balanced',  # Handles imbalanced classes
+        #     criterion='gini',  # Use "gini" or "entropy" based on experiments
+        #     random_state=42  # Ensures reproducibility
+        # ),
+        # 'GradientBoosting': GradientBoostingClassifier(
+        #     n_estimators=100,
+        #     max_depth=10,
+        #     learning_rate=0.4,  # Handles class imbalance
+        #     random_state=42
+        # ),
         'MLP': build_mlp_model(X_train, X_test),
         'LSTM': build_lstm_model(X_train, X_test),
         'GRU': build_gru_model(X_train, X_test)

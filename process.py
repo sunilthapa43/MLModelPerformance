@@ -98,14 +98,18 @@ def get_cicids_train_test():
 
 
 def get_ton_iot_train_test():
-    df = pd.read_csv(TON_IOT_ROOT + "train_test_network.csv", encoding="utf-8-sig", low_memory=False)
-    numerical_features = df.select_dtypes(include=[np.number]).columns.tolist()
+    df = pd.read_csv(TON_IOT_ROOT + "train_test_network.csv")
     df.replace("-", np.nan, inplace=True)
+    df, y = df.drop("label", axis=1), df["label"]
+    categorical_columns = get_cat_columns(df)
+    non_categorical_columns = [col for col in df.columns if col not in categorical_columns]
     # Clean the data
-    df = clean_data(df, encode_features=iot_ton_encode_features)
-    X_train, X_test, y_train, y_test = split_into_train_test(df, column_name="label")
+    df = clean_data(df, encode_features=categorical_columns)
+    X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=0.2, random_state=42, shuffle=True)
+    scalar = StandardScaler()
+    X_train[non_categorical_columns] = scalar.fit_transform(X_train[non_categorical_columns])
+    X_test[non_categorical_columns] = scalar.transform(X_test[non_categorical_columns])
     return X_train, X_test, y_train, y_test
-
 
 def get_usnw_train_test():
     train_df = pd.read_csv(USNW_ROOT + "UNSW_NB15_training-set.csv")
@@ -192,4 +196,37 @@ def preprocess_usnw_data(train_df, test_df):
     scaler = StandardScaler()
     X_train[non_categorical_columns] = scaler.fit_transform(X_train[non_categorical_columns])
     X_test[non_categorical_columns] = scaler.transform(X_test[non_categorical_columns])
+    return X_train, X_test, y_train, y_test
+
+
+def preprocess_ton_iot_data(df):
+    #  for classifiers only, for deep learning use the above mentioned code for preprocessing
+    df.replace('-', 'NA', inplace=True)
+    df = df.drop_duplicates().reset_index(drop=True)
+    selected_features = [
+        "ts",
+        "proto",  # From Network TON_IoT
+        "src_ip_bytes",  # From Network TON_IoT
+        "src_pkts",  # From Network TON_IoT
+        "dst_ip_bytes",  # From Network TON_IoT
+        "dst_pkts",  # From Network TON_IoT
+        "conn_state",  # From Network TON_IoT
+        "dst_bytes",  # From Network TON_IoT
+        "src_bytes",
+        "duration",  # From Network TON_IoT
+    ]
+    df = df[selected_features + ["label"]]
+
+    # Label encoding for categorical columns
+    categorical_columns = df.select_dtypes(include=['object', 'category']).columns
+    label_encoders = {}
+    for col in categorical_columns:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
+    X = df.drop(["label"], axis=1)
+    y = df["label"]
+
+    # Split the dataset
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, shuffle=True)
     return X_train, X_test, y_train, y_test
